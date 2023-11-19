@@ -126,22 +126,22 @@ def add_review(request, id):
         if request.user.is_authenticated:
             form = request.POST
             review = {
-                "name": "{request.user.first_name} {request.user.last_name}",
-                "dealership": dealer_id,
+                "name": "{request.user.username}",
+                "dealership": id,
                 "review": form["content"],
                 "purchase": form.get("purchasecheck"),
                 }
             if form.get("purchasecheck"):
                 review["purchase_date"] = datetime.strptime(form.get("purchasedate"), "%m/%d/%Y").isoformat()
                 car = CarModel.objects.get(pk=form["car"])
-                review["car_make"] = car.carmake.name
+                review["car_make"] = car.make.name
                 review["car_model"] = car.name
                 review["car_year"]= car.year.strftime("%Y")
             json_payload = {"review": review}
             print (json_payload)
             review_post_url = "https://lizavetalikh-5000.theiadocker-2-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"
-            restapis.post_request(url, json_payload, dealerId=dealer_id)
-            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+            post_request(review_post_url, json_payload, id=id)
+            return redirect("djangoapp:dealer_details", id=id)
         else:
             return redirect("/djangoapp/login")
 
